@@ -1,0 +1,27 @@
+script
+  var socket   = new io.Socket()
+    , second   = new Date().getSeconds()
+    , requests = 0
+    
+  socket.connect();
+  socket.on('connect', function(){
+    socket.send('gimme')
+  })
+  socket.on('message', function(data) {
+    var s = new Date().getSeconds()
+  
+    document.getElementById('foo').style.backgroundImage = "url(data:image/jpg;base64," + data + ")"
+
+    requests++
+    if (s > second) {
+      document.getElementById('fps').innerHTML = requests + " fps"
+      second = s
+      requests = 0
+    }
+    
+    socket.send('gimme')
+  })
+  socket.on('disconnect', function(){})
+
+#fps
+img#foo(style="width:800px; height:600px")
