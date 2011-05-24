@@ -1,7 +1,9 @@
 script
-  var socket   = new io.Socket()
-    , second   = new Date().getSeconds()
-    , requests = 0
+  var socket = new io.Socket()
+    , second = new Date().getSeconds()
+    , fps    = 0
+    , fpm    = 0
+    , even   = true
     
   socket.connect();
   socket.on('connect', function(){
@@ -9,19 +11,37 @@ script
   })
   socket.on('message', function(data) {
     var s = new Date().getSeconds()
-  
-    document.getElementById('foo').style.backgroundImage = "url(data:image/jpg;base64," + data + ")"
+      , c = document.getElementById('target')
+    
+    if(even) {
+      c.src = "data:image/jpg;base64," + data
+    } else {
+      c.style.background = "url(data:image/jpg;base64," + data + ")"
+      c.src = ""
+    }
 
-    requests++
+    even = !even
+
+    fps++
+    fpm++
+
     if (s > second) {
-      document.getElementById('fps').innerHTML = requests + " fps"
+      document.getElementById('fps').innerHTML = fps + " fps"
+      document.getElementById('fpm').innerHTML = fpm + " fpm"
       second = s
-      requests = 0
+      fps = 0
+    }
+    
+    if(second == 0) {
+      fpm = 0
     }
     
     socket.send('gimme')
   })
   socket.on('disconnect', function(){})
 
-#fps
-img#foo(style="width:800px; height:600px")
+#fps(style="width:800px;height: 30px;")
+br
+#fpm(style="width:800px;height: 30px;")
+br
+img#target(style="width:400px; height:300px")

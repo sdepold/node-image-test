@@ -1,6 +1,12 @@
 var express = require('express')
   , io      = require('socket.io')
   , fs      = require('fs')
+  , images  = fs.readdirSync(__dirname + "/public/images").filter(function(f) {
+                return f.indexOf('img') == 0
+              }).map(function(f) {
+                return fs.readFileSync(__dirname + "/public/images/" + f).toString('base64')
+              })
+  
 
 var app = module.exports = express.createServer()
 
@@ -30,10 +36,7 @@ io.listen(app).on('connection', function(client){
   console.log('just received connection')
   // new client is here!
   client.on('message', function(){
-    fs.readFile(__dirname + "/public/images/img" + (~~(Math.random() * 5) + 1) + ".jpg", function(err, data) {
-      if(err) console.log(err)
-      else client.send(data.toString('base64'))
-    })
+    client.send(images[~~(Math.random() * images.length - 1)])
   })
   client.on('disconnect', function(){
   })
